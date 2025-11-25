@@ -5,6 +5,14 @@ from .models import Company, Employee
 from .serializers import CompanySerializer, EmployeeSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+class CustomPermission(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return request.user.is_staff
 
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -48,4 +56,4 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [CustomPermission, IsAuthenticated]
